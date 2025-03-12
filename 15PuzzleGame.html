@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>15 Puzzle Game</title>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <style>
+    .puzzle-container {
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      grid-template-rows: repeat(4, 100px);
+      gap: 5px;
+      width: fit-content;
+    }
+    .tile {
+      width: 100px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .tile.empty {
+      background-color: #f1f1f1;
+      cursor: default;
+    }
+    .tile:hover:not(.empty) {
+      background-color: #45a049;
+    }
+    .message {
+      text-align: center;
+      font-size: 20px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+<header class="w3-bar w3-black">
+   <a href="index.html" class="w3-bar-item w3-button">Home</a>
+   <a href="blogs.html" class="w3-bar-item w3-button">Blogs</a>
+   <a href="index.html" class="w3-bar-item w3-button">Game</a>
+</header>
+<div class="w3-margin">
+  <h1>15 Puzzle Game</h1>
+  <div class="puzzle-container" id="puzzle-container"></div>
+  <div class="message" id="message"></div>
+  <button class="w3-button w3-green w3-margin-top" onclick="shuffleTiles()">Shuffle</button>
+</div>
+
+<footer class="w3-container w3-teal w3-center w3-margin-top">
+  &copy; <span id="copyrightYear"></span> Brajesh Kumar
+</footer>
+
+ <script>
+    const puzzleContainer = document.getElementById('puzzle-container');
+    const message = document.getElementById('message');
+    let tiles = [];
+    let emptyIndex = 15; // The empty space is initially at the bottom-right corner
+
+    // Initialize the puzzle
+    function initializePuzzle() {
+      tiles = Array.from({ length: 15 }, (_, i) => i + 1); // Tiles 1 to 15
+      tiles.push(null); // Empty space represented by null
+      renderPuzzle();
+    }
+
+    // Render the puzzle grid
+    function renderPuzzle() {
+      puzzleContainer.innerHTML = '';
+      tiles.forEach((tile, index) => {
+        const tileElement = document.createElement('div');
+        tileElement.classList.add('tile', 'w3-card');
+        if (tile === null) {
+          tileElement.classList.add('empty');
+          tileElement.textContent = '';
+        } else {
+          tileElement.textContent = tile;
+        }
+        tileElement.addEventListener('click', () => moveTile(index));
+        puzzleContainer.appendChild(tileElement);
+      });
+    }
+
+    // Move a tile into the empty space
+    function moveTile(index) {
+      const row = Math.floor(index / 4);
+      const col = index % 4;
+      const emptyRow = Math.floor(emptyIndex / 4);
+      const emptyCol = emptyIndex % 4;
+
+      // Check if the clicked tile is adjacent to the empty space
+      if ((Math.abs(row - emptyRow) === 1 && col === emptyCol) || (Math.abs(col - emptyCol) === 1 && row === emptyRow)) {
+        // Swap the tile with the empty space
+        [tiles[index], tiles[emptyIndex]] = [tiles[emptyIndex], tiles[index]];
+        emptyIndex = index;
+        renderPuzzle();
+
+        // Check if the puzzle is solved
+        if (isSolved()) {
+          message.textContent = 'Congratulations! You solved the puzzle!';
+        }
+      }
+    }
+
+    // Shuffle the tiles
+    function shuffleTiles() {
+      do {
+        tiles = tiles.sort(() => Math.random() - 0.5); // Randomly shuffle the tiles
+      } while (!isSolvable()); // Ensure the shuffled configuration is solvable
+      emptyIndex = tiles.indexOf(null); // Update the empty space index
+      renderPuzzle();
+      message.textContent = '';
+    }
+
+    // Check if the puzzle is solvable
+    function isSolvable() {
+      const tempTiles = tiles.filter(tile => tile !== null);
+      let inversions = 0;
+
+      // Count the number of inversions
+      for (let i = 0; i < tempTiles.length - 1; i++) {
+        for (let j = i + 1; j < tempTiles.length; j++) {
+          if (tempTiles[i] > tempTiles[j]) inversions++;
+        }
+      }
+
+      // Check solvability based on the number of inversions and the empty space row
+      const emptyRow = Math.floor(emptyIndex / 4);
+      return (inversions % 2 === 0 && emptyRow % 2 === 1) || (inversions % 2 === 1 && emptyRow % 2 === 0);
+    }
+
+    // Check if the puzzle is solved
+    function isSolved() {
+      for (let i = 0; i < tiles.length - 1; i++) {
+        if (tiles[i] !== i + 1) return false;
+      }
+      return true;
+    }
+
+    // Start the game
+    initializePuzzle();
+	document.getElementById("copyrightYear").innerHTML = new Date().getFullYear();
+</script>
+</body>
+</html>

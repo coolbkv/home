@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tic-Tac-Toe</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <style>
     .board {
@@ -11,7 +11,6 @@
       grid-template-columns: repeat(3, 100px);
       grid-template-rows: repeat(3, 100px);
       gap: 5px;
-      margin: 20px auto;
       width: fit-content;
       position: relative;
     }
@@ -50,17 +49,18 @@
     }
   </style>
 </head>
-<body class="w3-container w3-center">
+<body>
 <header class="w3-bar w3-black">
         <a href="index.html" class="w3-bar-item w3-button">Home</a>
         <a href="blogs.html" class="w3-bar-item w3-button">Blogs</a>
         <a href="index.html" class="w3-bar-item w3-button">Game</a>
 </header>
-  
-  <h1>Test4</h1>
+
+<div class="w3-margin">
+  <h1>Tic-Tac-Toe</h1>
   <div class="player-info">
-    <p><strong id="player1Name"></strong>: <span id="player1Symbol"></span>
-    <strong id="player2Name"></strong>: <span id="player2Symbol"></span></p>
+    <strong id="player1Name"></strong>: <span id="player1Symbol"></span>
+    <strong id="player2Name"></strong>: <span id="player2Symbol"></span>
   </div>
   <div>
     <label for="opponent">Choose Opponent:</label>
@@ -68,14 +68,19 @@
       <option value="computer">Computer</option>
       <option value="human">Human</option>
     </select>
-  </div>
+  </div><br>
   <div class="board" id="board">
     <!-- Cells will be generated dynamically -->
   </div>
   <div class="message" id="message"></div>
   <button class="w3-button w3-green w3-margin-top" onclick="resetGame()">Reset Game</button>
+</div>
 
-  <script>
+<footer class="w3-container w3-teal w3-center w3-margin-top">
+  &copy; <span id="copyrightYear"></span> Brajesh Kumar
+</footer>
+
+<script>
     const boardElement = document.getElementById('board');
     const messageElement = document.getElementById('message');
     const player1NameElement = document.getElementById('player1Name');
@@ -314,10 +319,8 @@
 
     // Initialize the game
     resetGame();
-  </script>
-<footer class="w3-container w3-teal w3-center w3-margin-top">
-  &copy; <span id="copyrightYear"></span> Brajesh Kumar
-</footer>
-<script src="scripts.js"></script>
+  /* Get the current Year */
+	document.getElementById("copyrightYear").innerHTML = new Date().getFullYear();
+</script>
 </body>
 </html>
