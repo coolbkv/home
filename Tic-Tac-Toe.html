@@ -13,6 +13,7 @@
       gap: 5px;
       max-width: 300px; /* Limit maximum width */
       margin: 0 auto; /* Center the board */
+      position: relative; /* Required for absolute positioning of the winning line */
     }
 
     /* Cell styling */
@@ -280,6 +281,7 @@
       const rect2 = cell2.getBoundingClientRect();
       const boardRect = boardElement.getBoundingClientRect();
 
+      // Calculate positions relative to the board
       const x1 = rect1.left + rect1.width / 2 - boardRect.left;
       const y1 = rect1.top + rect1.height / 2 - boardRect.top;
       const x2 = rect2.left + rect2.width / 2 - boardRect.left;
