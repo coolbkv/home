@@ -9,21 +9,21 @@
     /* Puzzle container */
     .puzzle-container {
       display: grid;
-      grid-template-columns: repeat(4, 100px);
-      grid-template-rows: repeat(4, 100px);
+      grid-template-columns: repeat(4, 1fr);
       gap: 5px;
-      width: fit-content;
+      max-width: 420px; /* Limit maximum width */
+      margin: 0 auto; /* Center the container */
     }
 
     /* Reference container */
     .reference-container {
       display: grid;
-      grid-template-columns: repeat(4, 50px);
-      grid-template-rows: repeat(4, 50px);
+      grid-template-columns: repeat(4, 1fr);
       gap: 3px;
       background-color: #f1f1f1; /* Gray background */
       padding: 5px;
-      width: fit-content;
+      max-width: 210px; /* Limit maximum width */
+      margin: 0 auto; /* Center the container */
     }
 
     /* Message container */
@@ -32,7 +32,8 @@
       font-size: 18px;
       padding: 10px;
       border: 1px solid #4CAF50;
-      width: fit-content;
+      max-width: 420px; /* Limit maximum width */
+      margin: 0 auto; /* Center the container */
     }
 
     /* Tile styling */
@@ -46,14 +47,12 @@
       color: white;
       cursor: pointer;
       transition: background-color 0.3s;
+      aspect-ratio: 1; /* Ensure tiles are square */
     }
     .puzzle-container .tile {
-      width: 100px;
-      height: 100px;
+      width: 100%; /* Full width of grid cell */
     }
     .reference-container .tile {
-      width: 50px;
-      height: 50px;
       font-size: 14px; /* Smaller font for reference tiles */
       background-color: #ccc; /* Gray tiles for reference */
     }
@@ -76,6 +75,9 @@
       display: block;
       padding: 5px;
       font-size: 16px;
+      width: 100%;
+      max-width: 420px; /* Limit maximum width */
+      margin: 0 auto; /* Center the dropdown */
     }
 
     /* Disabled state */
@@ -83,62 +85,49 @@
       pointer-events: none;
       opacity: 0.6;
     }
-
-    /* Mobile responsiveness */
-    @media (max-width: 600px) {
-      .puzzle-container {
-        grid-template-columns: repeat(4, 80px);
-        grid-template-rows: repeat(4, 80px);
-      }
-      .puzzle-container .tile {
-        width: 80px;
-        height: 80px;
-        font-size: 20px;
-      }
-      .reference-container {
-        grid-template-columns: repeat(4, 40px);
-        grid-template-rows: repeat(4, 40px);
-      }
-      .reference-container .tile {
-        width: 40px;
-        height: 40px;
-        font-size: 12px;
-      }
-    }
   </style>
 </head>
 <body>
-<header class="w3-bar w3-black">
-   <a href="index.html" class="w3-bar-item w3-button">Home</a>
-   <a href="blogs.html" class="w3-bar-item w3-button">Blogs</a>
-   <a href="index.html" class="w3-bar-item w3-button">Game</a>
-</header>
-  <h1>15 Puzzle Game</h1>
-  <!-- Puzzle Box -->
-  <div class="w3-margin">
-  <select class="level-dropdown" id="level-dropdown" onchange="changeLevel()">
-	<option value="" selected disabled>-- Select a Level to Play --</option>
-	<option value="1">Level 1: 1 to 15</option>
-	<option value="2">Level 2: Reverse Order</option>
-	<option value="3">Level 3: Diagonal Order</option>
-	<option value="4">Level 4: Spiral Order</option>
-	<option value="5">Level 5: Snake Pattern</option>
-	<option value="6">Level 6: Even-Odd Separation</option>
-	<option value="7">Level 7: Prime Numbers First</option>
-	<option value="8">Level 8: Fibonacci Sequence</option>
-	<option value="9">Level 9: Random Solvable</option>
-  </select><br>
-  <div class="puzzle-container disabled" id="puzzle-container"></div><br>
-  <div class="class="w3-panel w3-border" id="message-container">
+  <header class="w3-bar w3-black">
+    <a href="index.html" class="w3-bar-item w3-button">Home</a>
+    <a href="blogs.html" class="w3-bar-item w3-button">Blogs</a>
+    <a href="index.html" class="w3-bar-item w3-button">Game</a>
+  </header>
+
+  <div class="w3-container w3-margin-top">
+    <h1 class="w3-center">15 Puzzle Game</h1>
+
+    <!-- Level Dropdown -->
+    <select class="level-dropdown w3-card" id="level-dropdown" onchange="changeLevel()">
+      <option value="" selected disabled>-- Select a Level to Play --</option>
+      <option value="1">Level 1: 1 to 15</option>
+      <option value="2">Level 2: Reverse Order</option>
+      <option value="3">Level 3: Diagonal Order</option>
+      <option value="4">Level 4: Spiral Order</option>
+      <option value="5">Level 5: Snake Pattern</option>
+      <option value="6">Level 6: Even-Odd Separation</option>
+      <option value="7">Level 7: Prime Numbers First</option>
+      <option value="8">Level 8: Fibonacci Sequence</option>
+      <option value="9">Level 9: Random Solvable</option>
+    </select>
+
+    <!-- Puzzle Container -->
+    <div class="puzzle-container disabled w3-margin-top" id="puzzle-container"></div>
+
+    <!-- Message Container -->
+    <div class="message-container w3-margin-top" id="message-container">
       <div id="counter">Moves: 0/80</div>
       <div id="message"></div>
+    </div>
+
+    <!-- Reference Container -->
+    <h5 class="w3-center">Reference to complete the Puzzle</h5>
+    <div class="reference-container w3-margin-top" id="reference-container"></div>
   </div>
-  <h5>Reference to complete the Puzzle</h5>
-  <div class="reference-container" id="reference-container"></div>
-  </div>
-<footer class="w3-container w3-teal w3-center w3-margin-top">
-  &copy; <span id="copyrightYear"></span> Brajesh Kumar
-</footer>
+
+  <footer class="w3-container w3-teal w3-center w3-margin-top">
+    &copy; <span id="copyrightYear"></span> Brajesh Kumar
+  </footer>
 
   <script>
     const puzzleContainer = document.getElementById('puzzle-container');
@@ -286,7 +275,7 @@
       currentLevel = parseInt(levelDropdown.value);
       goalTiles = levels[currentLevel];
       initializePuzzle();
-	  shuffleTiles();
+      shuffleTiles();
     }
 
     // Disable the puzzle
@@ -301,7 +290,7 @@
 
     // Start the game
     initializePuzzle();
-	document.getElementById("copyrightYear").innerHTML = new Date().getFullYear();
+    document.getElementById("copyrightYear").innerHTML = new Date().getFullYear();
   </script>
 </body>
 </html>
