@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>15 Puzzle Game</title>
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <style>
+    /* Puzzle container */
     .puzzle-container {
       display: grid;
       grid-template-columns: repeat(4, 100px);
@@ -13,9 +14,29 @@
       gap: 5px;
       width: fit-content;
     }
+
+    /* Reference container */
+    .reference-container {
+      display: grid;
+      grid-template-columns: repeat(4, 50px);
+      grid-template-rows: repeat(4, 50px);
+      gap: 3px;
+      background-color: #f1f1f1; /* Gray background */
+      padding: 5px;
+      width: fit-content;
+    }
+
+    /* Message container */
+    .message-container {
+      text-align: center;
+      font-size: 18px;
+      padding: 10px;
+      border: 1px solid #4CAF50;
+      width: fit-content;
+    }
+
+    /* Tile styling */
     .tile {
-      width: 100px;
-      height: 100px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -26,6 +47,16 @@
       cursor: pointer;
       transition: background-color 0.3s;
     }
+    .puzzle-container .tile {
+      width: 100px;
+      height: 100px;
+    }
+    .reference-container .tile {
+      width: 50px;
+      height: 50px;
+      font-size: 14px; /* Smaller font for reference tiles */
+      background-color: #ccc; /* Gray tiles for reference */
+    }
     .tile.empty {
       background-color: #f1f1f1;
       cursor: default;
@@ -33,10 +64,46 @@
     .tile:hover:not(.empty) {
       background-color: #45a049;
     }
-    .message {
-      text-align: center;
-      font-size: 20px;
-      margin-top: 20px;
+
+    /* Shuffle button */
+    .shuffle-button {
+      margin: 10px auto;
+      display: block;
+    }
+
+    /* Dropdown for levels */
+    .level-dropdown {
+      display: block;
+      padding: 5px;
+      font-size: 16px;
+    }
+
+    /* Disabled state */
+    .disabled {
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 600px) {
+      .puzzle-container {
+        grid-template-columns: repeat(4, 80px);
+        grid-template-rows: repeat(4, 80px);
+      }
+      .puzzle-container .tile {
+        width: 80px;
+        height: 80px;
+        font-size: 20px;
+      }
+      .reference-container {
+        grid-template-columns: repeat(4, 40px);
+        grid-template-rows: repeat(4, 40px);
+      }
+      .reference-container .tile {
+        width: 40px;
+        height: 40px;
+        font-size: 12px;
+      }
     }
   </style>
 </head>
@@ -46,28 +113,69 @@
    <a href="blogs.html" class="w3-bar-item w3-button">Blogs</a>
    <a href="index.html" class="w3-bar-item w3-button">Game</a>
 </header>
-<div class="w3-margin">
   <h1>15 Puzzle Game</h1>
-  <div class="puzzle-container" id="puzzle-container"></div>
-  <div class="message" id="message"></div>
-  <button class="w3-button w3-green w3-margin-top" onclick="shuffleTiles()">Shuffle</button>
-</div>
-
+  <!-- Puzzle Box -->
+  <div class="w3-margin">
+  <select class="level-dropdown" id="level-dropdown" onchange="changeLevel()">
+	<option value="" selected disabled>-- Select a Level to Play --</option>
+	<option value="1">Level 1: 1 to 15</option>
+	<option value="2">Level 2: Reverse Order</option>
+	<option value="3">Level 3: Diagonal Order</option>
+	<option value="4">Level 4: Spiral Order</option>
+	<option value="5">Level 5: Snake Pattern</option>
+	<option value="6">Level 6: Even-Odd Separation</option>
+	<option value="7">Level 7: Prime Numbers First</option>
+	<option value="8">Level 8: Fibonacci Sequence</option>
+	<option value="9">Level 9: Random Solvable</option>
+  </select><br>
+  <div class="puzzle-container disabled" id="puzzle-container"></div><br>
+  <div class="class="w3-panel w3-border" id="message-container">
+      <div id="counter">Moves: 0/80</div>
+      <div id="message"></div>
+  </div>
+  <h5>Reference to complete the Puzzle</h5>
+  <div class="reference-container" id="reference-container"></div>
+  </div>
 <footer class="w3-container w3-teal w3-center w3-margin-top">
   &copy; <span id="copyrightYear"></span> Brajesh Kumar
 </footer>
 
- <script>
+  <script>
     const puzzleContainer = document.getElementById('puzzle-container');
+    const referenceContainer = document.getElementById('reference-container');
+    const messageContainer = document.getElementById('message-container');
+    const counter = document.getElementById('counter');
     const message = document.getElementById('message');
+    const levelDropdown = document.getElementById('level-dropdown');
     let tiles = [];
     let emptyIndex = 15; // The empty space is initially at the bottom-right corner
+    let moveCount = 0; // Counter for the number of moves
+
+    // Level configurations
+    const levels = {
+      1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, null], // 1 to 15
+      2: [15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, null], // Reverse order
+      3: [1, 2, 4, 7, 3, 5, 8, 11, 6, 9, 12, 14, 10, 13, 15, null], // Diagonal order
+      4: [1, 2, 3, 4, 12, 13, 14, 5, 11, 15, 6, 7, 10, 9, 8, null], // Spiral order
+      5: [1, 2, 3, 4, 8, 7, 6, 5, 9, 10, 11, 12, 15, 14, 13, null], // Snake pattern
+      6: [1, 3, 5, 7, 9, 11, 13, 15, 2, 4, 6, 8, 10, 12, 14, null], // Even-odd separation
+      7: [2, 3, 5, 7, 11, 13, 1, 4, 6, 8, 9, 10, 12, 14, 15, null], // Prime numbers first
+      8: [1, 1, 2, 3, 5, 8, 13, 4, 6, 7, 9, 10, 11, 12, 14, null], // Fibonacci sequence
+      9: [1, 3, 5, 7, 2, 4, 6, 8, 9, 11, 13, 15, 10, 12, 14, null], // Random solvable
+    };
+
+    let currentLevel = 1; // Default level
+    let goalTiles = levels[currentLevel]; // Goal configuration for the current level
 
     // Initialize the puzzle
     function initializePuzzle() {
-      tiles = Array.from({ length: 15 }, (_, i) => i + 1); // Tiles 1 to 15
-      tiles.push(null); // Empty space represented by null
+      tiles = [...goalTiles]; // Copy goal configuration to tiles
+      emptyIndex = tiles.indexOf(null); // Update the empty space index
+      moveCount = 0; // Reset move counter
+      counter.textContent = `Moves: ${moveCount}/80`;
       renderPuzzle();
+      renderReference();
+      disablePuzzle(); // Disable the puzzle until shuffled
     }
 
     // Render the puzzle grid
@@ -87,6 +195,22 @@
       });
     }
 
+    // Render the reference configuration
+    function renderReference() {
+      referenceContainer.innerHTML = '';
+      goalTiles.forEach((tile) => {
+        const tileElement = document.createElement('div');
+        tileElement.classList.add('tile', 'w3-card');
+        if (tile === null) {
+          tileElement.classList.add('empty');
+          tileElement.textContent = '';
+        } else {
+          tileElement.textContent = tile;
+        }
+        referenceContainer.appendChild(tileElement);
+      });
+    }
+
     // Move a tile into the empty space
     function moveTile(index) {
       const row = Math.floor(index / 4);
@@ -99,11 +223,15 @@
         // Swap the tile with the empty space
         [tiles[index], tiles[emptyIndex]] = [tiles[emptyIndex], tiles[index]];
         emptyIndex = index;
+        moveCount++; // Increment move counter
+        counter.textContent = `Moves: ${moveCount}/80`;
         renderPuzzle();
 
         // Check if the puzzle is solved
         if (isSolved()) {
-          message.textContent = 'Congratulations! You solved the puzzle!';
+          const score = calculateScore();
+          message.textContent = `Congratulations! You solved the puzzle! Score: ${score}%`;
+          disablePuzzle(); // Disable the puzzle after solving
         }
       }
     }
@@ -114,13 +242,16 @@
         tiles = tiles.sort(() => Math.random() - 0.5); // Randomly shuffle the tiles
       } while (!isSolvable()); // Ensure the shuffled configuration is solvable
       emptyIndex = tiles.indexOf(null); // Update the empty space index
+      moveCount = 0; // Reset move counter
+      counter.textContent = `Moves: ${moveCount}/80`;
       renderPuzzle();
       message.textContent = '';
+      enablePuzzle(); // Enable the puzzle after shuffling
     }
 
     // Check if the puzzle is solvable
     function isSolvable() {
-      const tempTiles = tiles.filter(tile => tile !== null);
+      const tempTiles = tiles.filter(tile => tile !== null); // Ignore the empty space
       let inversions = 0;
 
       // Count the number of inversions
@@ -138,14 +269,39 @@
     // Check if the puzzle is solved
     function isSolved() {
       for (let i = 0; i < tiles.length - 1; i++) {
-        if (tiles[i] !== i + 1) return false;
+        if (tiles[i] !== goalTiles[i]) return false;
       }
       return true;
+    }
+
+    // Calculate the score as a percentage
+    function calculateScore() {
+      const minMoves = 80; // Minimum number of moves required to solve the puzzle
+      const score = (minMoves / moveCount) * 100;
+      return Math.round(score); // Round to the nearest integer
+    }
+
+    // Change level based on dropdown selection
+    function changeLevel() {
+      currentLevel = parseInt(levelDropdown.value);
+      goalTiles = levels[currentLevel];
+      initializePuzzle();
+	  shuffleTiles();
+    }
+
+    // Disable the puzzle
+    function disablePuzzle() {
+      puzzleContainer.classList.add('disabled');
+    }
+
+    // Enable the puzzle
+    function enablePuzzle() {
+      puzzleContainer.classList.remove('disabled');
     }
 
     // Start the game
     initializePuzzle();
 	document.getElementById("copyrightYear").innerHTML = new Date().getFullYear();
-</script>
+  </script>
 </body>
 </html>
