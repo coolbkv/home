@@ -6,17 +6,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <style>
+    /* Board styling */
     .board {
       display: grid;
-      grid-template-columns: repeat(3, 100px);
-      grid-template-rows: repeat(3, 100px);
+      grid-template-columns: repeat(3, 1fr);
       gap: 5px;
-      width: fit-content;
-      position: relative;
+      max-width: 300px; /* Limit maximum width */
+      margin: 0 auto; /* Center the board */
     }
+
+    /* Cell styling */
     .cell {
-      width: 100px;
-      height: 100px;
+      width: 100%; /* Full width of grid cell */
+      aspect-ratio: 1; /* Ensure cells are square */
       display: flex;
       align-items: center;
       justify-content: center;
@@ -33,14 +35,21 @@
     .cell:hover {
       background-color: #ddd;
     }
+
+    /* Message styling */
     .message {
       text-align: center;
       font-size: 1.5em;
       margin-top: 20px;
     }
+
+    /* Player info styling */
     .player-info {
       margin-bottom: 20px;
+      text-align: center;
     }
+
+    /* Winning line styling */
     .win-line {
       position: absolute;
       background-color: black;
@@ -50,37 +59,49 @@
   </style>
 </head>
 <body>
-<header class="w3-bar w3-black">
-        <a href="index.html" class="w3-bar-item w3-button">Home</a>
-        <a href="blogs.html" class="w3-bar-item w3-button">Blogs</a>
-        <a href="index.html" class="w3-bar-item w3-button">Game</a>
-</header>
+  <header class="w3-bar w3-black">
+    <a href="index.html" class="w3-bar-item w3-button">Home</a>
+    <a href="blogs.html" class="w3-bar-item w3-button">Blogs</a>
+    <a href="index.html" class="w3-bar-item w3-button">Game</a>
+  </header>
 
-<div class="w3-margin">
-  <h1>Tic-Tac-Toe</h1>
-  <div class="player-info">
-    <strong id="player1Name"></strong>: <span id="player1Symbol"></span>
-    <strong id="player2Name"></strong>: <span id="player2Symbol"></span>
+  <div class="w3-container w3-margin-top">
+    <h1 class="w3-center">Tic-Tac-Toe</h1>
+
+    <!-- Player Info -->
+    <div class="player-info">
+      <strong id="player1Name"></strong>: <span id="player1Symbol"></span>
+      <strong id="player2Name"></strong>: <span id="player2Symbol"></span>
+    </div>
+
+    <!-- Opponent Selection -->
+    <div class="w3-center">
+      <label for="opponent">Choose Opponent:</label>
+      <select id="opponent" class="w3-select w3-border" onchange="resetGame()">
+        <option value="computer">Computer</option>
+        <option value="human">Human</option>
+      </select>
+    </div><br>
+
+    <!-- Game Board -->
+    <div class="board w3-card" id="board">
+      <!-- Cells will be generated dynamically -->
+    </div>
+
+    <!-- Game Message -->
+    <div class="message" id="message"></div>
+
+    <!-- Reset Button -->
+    <div class="w3-center">
+      <button class="w3-button w3-green w3-margin-top" onclick="resetGame()">Reset Game</button>
+    </div>
   </div>
-  <div>
-    <label for="opponent">Choose Opponent:</label>
-    <select id="opponent" onchange="resetGame()">
-      <option value="computer">Computer</option>
-      <option value="human">Human</option>
-    </select>
-  </div><br>
-  <div class="board" id="board">
-    <!-- Cells will be generated dynamically -->
-  </div>
-  <div class="message" id="message"></div>
-  <button class="w3-button w3-green w3-margin-top" onclick="resetGame()">Reset Game</button>
-</div>
 
-<footer class="w3-container w3-teal w3-center w3-margin-top">
-  &copy; <span id="copyrightYear"></span> Brajesh Kumar
-</footer>
+  <footer class="w3-container w3-teal w3-center w3-margin-top">
+    &copy; <span id="copyrightYear"></span> Brajesh Kumar
+  </footer>
 
-<script>
+  <script>
     const boardElement = document.getElementById('board');
     const messageElement = document.getElementById('message');
     const player1NameElement = document.getElementById('player1Name');
@@ -319,8 +340,7 @@
 
     // Initialize the game
     resetGame();
-  /* Get the current Year */
-	document.getElementById("copyrightYear").innerHTML = new Date().getFullYear();
-</script>
+    document.getElementById("copyrightYear").innerHTML = new Date().getFullYear();
+  </script>
 </body>
 </html>
