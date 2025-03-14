@@ -13,6 +13,10 @@
       gap: 5px;
       max-width: 420px; /* Limit maximum width */
       margin: 0 auto; /* Center the container */
+      background-color: #f1f1f1; /* Light gray background */
+      padding: 10px;
+      border-radius: 10px; /* Rounded corners for the board */
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
     }
 
     /* Reference container */
@@ -20,10 +24,12 @@
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 3px;
-      background-color: #f1f1f1; /* Gray background */
+      background-color: #f1f1f1; /* Light gray background */
       padding: 5px;
       max-width: 210px; /* Limit maximum width */
       margin: 0 auto; /* Center the container */
+      border-radius: 10px; /* Rounded corners for the reference board */
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
     }
 
     /* Message container */
@@ -31,9 +37,12 @@
       text-align: center;
       font-size: 18px;
       padding: 10px;
-      border: 1px solid #4CAF50;
+      border: 1px solid #ddd; /* Light border */
       max-width: 420px; /* Limit maximum width */
       margin: 0 auto; /* Center the container */
+      border-radius: 10px; /* Rounded corners for the message container */
+      background-color: #fff; /* White background */
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
     }
 
     /* Tile styling */
@@ -43,11 +52,12 @@
       justify-content: center;
       font-size: 24px;
       font-weight: bold;
-      background-color: #4CAF50;
+      background-color: #2196F3; /* Blue background */
       color: white;
       cursor: pointer;
-      transition: background-color 0.3s;
+      transition: background-color 0.3s, transform 0.2s;
       aspect-ratio: 1; /* Ensure tiles are square */
+      border-radius: 10px; /* Rounded corners for tiles */
     }
     .puzzle-container .tile {
       width: 100%; /* Full width of grid cell */
@@ -55,13 +65,15 @@
     .reference-container .tile {
       font-size: 14px; /* Smaller font for reference tiles */
       background-color: #ccc; /* Gray tiles for reference */
+      border-radius: 5px; /* Slightly rounded corners for reference tiles */
     }
     .tile.empty {
       background-color: #f1f1f1;
       cursor: default;
     }
     .tile:hover:not(.empty) {
-      background-color: #45a049;
+      background-color: #1976D2; /* Darker blue on hover */
+      transform: scale(1.05); /* Slight zoom effect on hover */
     }
 
     /* Shuffle button */
@@ -78,6 +90,7 @@
       width: 100%;
       max-width: 420px; /* Limit maximum width */
       margin: 0 auto; /* Center the dropdown */
+      border-radius: 5px; /* Rounded corners for dropdown */
     }
 
     /* Disabled state */
@@ -90,6 +103,17 @@
     #shuffle-again-button {
       display: none; /* Hidden by default */
       margin: 10px auto; /* Center the button */
+      border-radius: 5px; /* Rounded corners for button */
+    }
+
+    /* Success state (puzzle solved) */
+    .success .puzzle-container {
+      background-color: #4CAF50; /* Green background */
+    }
+
+    /* Unsolvable state */
+    .unsolvable .puzzle-container {
+      background-color: #F44336; /* Red background */
     }
   </style>
 </head>
@@ -157,12 +181,45 @@
       5: [1, 2, 3, 4, 8, 7, 6, 5, 9, 10, 11, 12, 15, 14, 13, null], // Snake pattern
       6: [1, 3, 5, 7, 9, 11, 13, 15, 2, 4, 6, 8, 10, 12, 14, null], // Even-odd separation
       7: [2, 3, 5, 7, 11, 13, 1, 4, 6, 8, 9, 10, 12, 14, 15, null], // Prime numbers first
-      8: [1, 1, 2, 3, 5, 8, 13, 4, 6, 7, 9, 10, 11, 12, 14, null], // Fibonacci sequence
+      8: [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, null], // Fibonacci sequence
       9: [1, 3, 5, 7, 2, 4, 6, 8, 9, 11, 13, 15, 10, 12, 14, null], // Random solvable
     };
 
     let currentLevel = 1; // Default level
     let goalTiles = levels[currentLevel]; // Goal configuration for the current level
+
+    // Function to count inversions
+    function countInversions(puzzle) {
+      let inversions = 0;
+      for (let i = 0; i < puzzle.length; i++) {
+        for (let j = i + 1; j < puzzle.length; j++) {
+          if (puzzle[i] !== null && puzzle[j] !== null && puzzle[i] > puzzle[j]) {
+            inversions++;
+          }
+        }
+      }
+      return inversions;
+    }
+
+    // Function to get the row number of the empty tile (counting from the bottom)
+    function getEmptyTileRow(puzzle, size) {
+      const emptyIndex = puzzle.indexOf(null);
+      return Math.floor(emptyIndex / size) + 1;
+    }
+
+    // Function to check if the puzzle is solvable
+    function isSolvable(puzzle, target, size) {
+      const puzzleInversions = countInversions(puzzle);
+      const targetInversions = countInversions(target);
+
+      const puzzleEmptyRow = getEmptyTileRow(puzzle, size);
+      const targetEmptyRow = getEmptyTileRow(target, size);
+
+      const puzzleParity = (puzzleInversions + puzzleEmptyRow) % 2;
+      const targetParity = (targetInversions + targetEmptyRow) % 2;
+
+      return puzzleParity === targetParity;
+    }
 
     // Initialize the puzzle
     function initializePuzzle() {
@@ -174,6 +231,7 @@
       renderReference();
       disablePuzzle(); // Disable the puzzle until shuffled
       hideShuffleAgainButton(); // Hide the "Shuffle Again" button
+      resetBoardColor(); // Reset board color to light gray
     }
 
     // Render the puzzle grid
@@ -223,12 +281,22 @@
         moveTile(randomMove, false); // Move without updating the move counter
       }
 
+      // Check solvability
+      const solvable = isSolvable(tiles, goalTiles, 4);
+      if (!solvable) {
+        puzzleContainer.parentElement.classList.add('unsolvable');
+        counter.textContent = `Moves: ${moveCount}/80`; // Remove "S" or "U"
+      } else {
+        puzzleContainer.parentElement.classList.remove('unsolvable');
+        counter.textContent = `Moves: ${moveCount}/80`;
+      }
+
       moveCount = 0; // Reset move counter
-      counter.textContent = `Moves: ${moveCount}/80`;
       renderPuzzle();
       message.textContent = '';
       enablePuzzle(); // Enable the puzzle after shuffling
       hideShuffleAgainButton(); // Hide the "Shuffle Again" button
+      resetBoardColor(); // Reset board color to light gray
     }
 
     // Get possible moves (indices of tiles that can move into the empty space)
@@ -273,6 +341,7 @@
         if (isSolved()) {
           const score = calculateScore();
           message.textContent = `Congratulations! You solved the puzzle! Score: ${score}%`;
+          puzzleContainer.parentElement.classList.add('success'); // Turn board green
           showShuffleAgainButton(); // Show the "Shuffle Again" button
           disablePuzzle(); // Disable the puzzle after solving
         }
@@ -320,6 +389,11 @@
     // Hide the "Shuffle Again" button
     function hideShuffleAgainButton() {
       shuffleAgainButton.style.display = 'none';
+    }
+
+    // Reset board color to blue
+    function resetBoardColor() {
+      puzzleContainer.parentElement.classList.remove('success', 'unsolvable');
     }
 
     // Event listener for the "Shuffle Again" button
