@@ -85,6 +85,12 @@
       pointer-events: none;
       opacity: 0.6;
     }
+
+    /* Shuffle Again button */
+    #shuffle-again-button {
+      display: none; /* Hidden by default */
+      margin: 10px auto; /* Center the button */
+    }
   </style>
 </head>
 <body>
@@ -118,6 +124,7 @@
     <div class="message-container w3-margin-top" id="message-container">
       <div id="counter">Moves: 0/80</div>
       <div id="message"></div>
+      <button id="shuffle-again-button" class="w3-button w3-green w3-margin-top">Shuffle Again</button>
     </div>
 
     <!-- Reference Container -->
@@ -136,6 +143,7 @@
     const counter = document.getElementById('counter');
     const message = document.getElementById('message');
     const levelDropdown = document.getElementById('level-dropdown');
+    const shuffleAgainButton = document.getElementById('shuffle-again-button');
     let tiles = [];
     let emptyIndex = 15; // The empty space is initially at the bottom-right corner
     let moveCount = 0; // Counter for the number of moves
@@ -165,6 +173,7 @@
       renderPuzzle();
       renderReference();
       disablePuzzle(); // Disable the puzzle until shuffled
+      hideShuffleAgainButton(); // Hide the "Shuffle Again" button
     }
 
     // Render the puzzle grid
@@ -200,8 +209,48 @@
       });
     }
 
-    // Move a tile into the empty space
-    function moveTile(index) {
+    // Shuffle the tiles while ensuring the puzzle remains solvable
+    function shuffleTiles() {
+      // Start from the solved state
+      tiles = [...goalTiles];
+      emptyIndex = tiles.indexOf(null);
+
+      // Perform a large number of random valid moves to shuffle the puzzle
+      const numShuffles = 1000; // Number of random moves to perform
+      for (let i = 0; i < numShuffles; i++) {
+        const possibleMoves = getPossibleMoves();
+        const randomMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+        moveTile(randomMove, false); // Move without updating the move counter
+      }
+
+      moveCount = 0; // Reset move counter
+      counter.textContent = `Moves: ${moveCount}/80`;
+      renderPuzzle();
+      message.textContent = '';
+      enablePuzzle(); // Enable the puzzle after shuffling
+      hideShuffleAgainButton(); // Hide the "Shuffle Again" button
+    }
+
+    // Get possible moves (indices of tiles that can move into the empty space)
+    function getPossibleMoves() {
+      const moves = [];
+      const row = Math.floor(emptyIndex / 4);
+      const col = emptyIndex % 4;
+
+      // Check tile above
+      if (row > 0) moves.push(emptyIndex - 4);
+      // Check tile below
+      if (row < 3) moves.push(emptyIndex + 4);
+      // Check tile to the left
+      if (col > 0) moves.push(emptyIndex - 1);
+      // Check tile to the right
+      if (col < 3) moves.push(emptyIndex + 1);
+
+      return moves;
+    }
+
+    // Move a tile into the empty space (without updating the move counter)
+    function moveTile(index, updateCounter = true) {
       const row = Math.floor(index / 4);
       const col = index % 4;
       const emptyRow = Math.floor(emptyIndex / 4);
@@ -212,47 +261,22 @@
         // Swap the tile with the empty space
         [tiles[index], tiles[emptyIndex]] = [tiles[emptyIndex], tiles[index]];
         emptyIndex = index;
-        moveCount++; // Increment move counter
-        counter.textContent = `Moves: ${moveCount}/80`;
+
+        if (updateCounter) {
+          moveCount++; // Increment move counter
+          counter.textContent = `Moves: ${moveCount}/80`;
+        }
+
         renderPuzzle();
 
         // Check if the puzzle is solved
         if (isSolved()) {
           const score = calculateScore();
           message.textContent = `Congratulations! You solved the puzzle! Score: ${score}%`;
+          showShuffleAgainButton(); // Show the "Shuffle Again" button
           disablePuzzle(); // Disable the puzzle after solving
         }
       }
-    }
-
-    // Shuffle the tiles
-    function shuffleTiles() {
-      do {
-        tiles = tiles.sort(() => Math.random() - 0.5); // Randomly shuffle the tiles
-      } while (!isSolvable()); // Ensure the shuffled configuration is solvable
-      emptyIndex = tiles.indexOf(null); // Update the empty space index
-      moveCount = 0; // Reset move counter
-      counter.textContent = `Moves: ${moveCount}/80`;
-      renderPuzzle();
-      message.textContent = '';
-      enablePuzzle(); // Enable the puzzle after shuffling
-    }
-
-    // Check if the puzzle is solvable
-    function isSolvable() {
-      const tempTiles = tiles.filter(tile => tile !== null); // Ignore the empty space
-      let inversions = 0;
-
-      // Count the number of inversions
-      for (let i = 0; i < tempTiles.length - 1; i++) {
-        for (let j = i + 1; j < tempTiles.length; j++) {
-          if (tempTiles[i] > tempTiles[j]) inversions++;
-        }
-      }
-
-      // Check solvability based on the number of inversions and the empty space row
-      const emptyRow = Math.floor(emptyIndex / 4);
-      return (inversions % 2 === 0 && emptyRow % 2 === 1) || (inversions % 2 === 1 && emptyRow % 2 === 0);
     }
 
     // Check if the puzzle is solved
@@ -287,6 +311,22 @@
     function enablePuzzle() {
       puzzleContainer.classList.remove('disabled');
     }
+
+    // Show the "Shuffle Again" button
+    function showShuffleAgainButton() {
+      shuffleAgainButton.style.display = 'block';
+    }
+
+    // Hide the "Shuffle Again" button
+    function hideShuffleAgainButton() {
+      shuffleAgainButton.style.display = 'none';
+    }
+
+    // Event listener for the "Shuffle Again" button
+    shuffleAgainButton.addEventListener('click', () => {
+      shuffleTiles();
+      hideShuffleAgainButton();
+    });
 
     // Start the game
     initializePuzzle();
