@@ -13,6 +13,10 @@
       gap: 5px;
       max-width: 420px; /* Limit maximum width */
       margin: 0 auto; /* Center the container */
+      background-color: #f1f1f1; /* Light gray background */
+      padding: 10px;
+      border-radius: 10px; /* Rounded corners for the board */
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
     }
 
     /* Reference container */
@@ -20,10 +24,12 @@
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 3px;
-      background-color: #f1f1f1; /* Gray background */
+      background-color: #f1f1f1; /* Light gray background */
       padding: 5px;
       max-width: 210px; /* Limit maximum width */
       margin: 0 auto; /* Center the container */
+      border-radius: 10px; /* Rounded corners for the reference board */
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
     }
 
     /* Message container */
@@ -31,9 +37,12 @@
       text-align: center;
       font-size: 18px;
       padding: 10px;
-      border: 1px solid #4CAF50;
+      border: 1px solid #ddd; /* Light border */
       max-width: 420px; /* Limit maximum width */
       margin: 0 auto; /* Center the container */
+      border-radius: 10px; /* Rounded corners for the message container */
+      background-color: #fff; /* White background */
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
     }
 
     /* Tile styling */
@@ -43,11 +52,12 @@
       justify-content: center;
       font-size: 24px;
       font-weight: bold;
-      background-color: #4CAF50;
+      background-color: #2196F3; /* Blue background */
       color: white;
       cursor: pointer;
-      transition: background-color 0.3s;
+      transition: background-color 0.3s, transform 0.2s;
       aspect-ratio: 1; /* Ensure tiles are square */
+      border-radius: 10px; /* Rounded corners for tiles */
     }
     .puzzle-container .tile {
       width: 100%; /* Full width of grid cell */
@@ -55,13 +65,15 @@
     .reference-container .tile {
       font-size: 14px; /* Smaller font for reference tiles */
       background-color: #ccc; /* Gray tiles for reference */
+      border-radius: 5px; /* Slightly rounded corners for reference tiles */
     }
     .tile.empty {
       background-color: #f1f1f1;
       cursor: default;
     }
     .tile:hover:not(.empty) {
-      background-color: #45a049;
+      background-color: #1976D2; /* Darker blue on hover */
+      transform: scale(1.05); /* Slight zoom effect on hover */
     }
 
     /* Shuffle button */
@@ -78,12 +90,30 @@
       width: 100%;
       max-width: 420px; /* Limit maximum width */
       margin: 0 auto; /* Center the dropdown */
+      border-radius: 5px; /* Rounded corners for dropdown */
     }
 
     /* Disabled state */
     .disabled {
       pointer-events: none;
       opacity: 0.6;
+    }
+
+    /* Shuffle Again button */
+    #shuffle-again-button {
+      display: none; /* Hidden by default */
+      margin: 10px auto; /* Center the button */
+      border-radius: 5px; /* Rounded corners for button */
+    }
+
+    /* Success state (puzzle solved) */
+    .success .puzzle-container {
+      background-color: #4CAF50; /* Green background */
+    }
+
+    /* Unsolvable state */
+    .unsolvable .puzzle-container {
+      background-color: #F44336; /* Red background */
     }
   </style>
 </head>
@@ -118,6 +148,7 @@
     <div class="message-container w3-margin-top" id="message-container">
       <div id="counter">Moves: 0/80</div>
       <div id="message"></div>
+      <button id="shuffle-again-button" class="w3-button w3-green w3-margin-top">Shuffle Again</button>
     </div>
 
     <!-- Reference Container -->
@@ -136,6 +167,7 @@
     const counter = document.getElementById('counter');
     const message = document.getElementById('message');
     const levelDropdown = document.getElementById('level-dropdown');
+    const shuffleAgainButton = document.getElementById('shuffle-again-button');
     let tiles = [];
     let emptyIndex = 15; // The empty space is initially at the bottom-right corner
     let moveCount = 0; // Counter for the number of moves
@@ -149,12 +181,45 @@
       5: [1, 2, 3, 4, 8, 7, 6, 5, 9, 10, 11, 12, 15, 14, 13, null], // Snake pattern
       6: [1, 3, 5, 7, 9, 11, 13, 15, 2, 4, 6, 8, 10, 12, 14, null], // Even-odd separation
       7: [2, 3, 5, 7, 11, 13, 1, 4, 6, 8, 9, 10, 12, 14, 15, null], // Prime numbers first
-      8: [1, 1, 2, 3, 5, 8, 13, 4, 6, 7, 9, 10, 11, 12, 14, null], // Fibonacci sequence
+      8: [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, null], // Fibonacci sequence
       9: [1, 3, 5, 7, 2, 4, 6, 8, 9, 11, 13, 15, 10, 12, 14, null], // Random solvable
     };
 
     let currentLevel = 1; // Default level
     let goalTiles = levels[currentLevel]; // Goal configuration for the current level
+
+    // Function to count inversions
+    function countInversions(puzzle) {
+      let inversions = 0;
+      for (let i = 0; i < puzzle.length; i++) {
+        for (let j = i + 1; j < puzzle.length; j++) {
+          if (puzzle[i] !== null && puzzle[j] !== null && puzzle[i] > puzzle[j]) {
+            inversions++;
+          }
+        }
+      }
+      return inversions;
+    }
+
+    // Function to get the row number of the empty tile (counting from the bottom)
+    function getEmptyTileRow(puzzle, size) {
+      const emptyIndex = puzzle.indexOf(null);
+      return Math.floor(emptyIndex / size) + 1;
+    }
+
+    // Function to check if the puzzle is solvable
+    function isSolvable(puzzle, target, size) {
+      const puzzleInversions = countInversions(puzzle);
+      const targetInversions = countInversions(target);
+
+      const puzzleEmptyRow = getEmptyTileRow(puzzle, size);
+      const targetEmptyRow = getEmptyTileRow(target, size);
+
+      const puzzleParity = (puzzleInversions + puzzleEmptyRow) % 2;
+      const targetParity = (targetInversions + targetEmptyRow) % 2;
+
+      return puzzleParity === targetParity;
+    }
 
     // Initialize the puzzle
     function initializePuzzle() {
@@ -165,6 +230,8 @@
       renderPuzzle();
       renderReference();
       disablePuzzle(); // Disable the puzzle until shuffled
+      hideShuffleAgainButton(); // Hide the "Shuffle Again" button
+      resetBoardColor(); // Reset board color to light gray
     }
 
     // Render the puzzle grid
@@ -200,8 +267,58 @@
       });
     }
 
-    // Move a tile into the empty space
-    function moveTile(index) {
+    // Shuffle the tiles while ensuring the puzzle remains solvable
+    function shuffleTiles() {
+      // Start from the solved state
+      tiles = [...goalTiles];
+      emptyIndex = tiles.indexOf(null);
+
+      // Perform a large number of random valid moves to shuffle the puzzle
+      const numShuffles = 1000; // Number of random moves to perform
+      for (let i = 0; i < numShuffles; i++) {
+        const possibleMoves = getPossibleMoves();
+        const randomMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+        moveTile(randomMove, false); // Move without updating the move counter
+      }
+
+      // Check solvability
+      const solvable = isSolvable(tiles, goalTiles, 4);
+      if (!solvable) {
+        puzzleContainer.parentElement.classList.add('unsolvable');
+        counter.textContent = `Moves: ${moveCount}/80`; // Remove "S" or "U"
+      } else {
+        puzzleContainer.parentElement.classList.remove('unsolvable');
+        counter.textContent = `Moves: ${moveCount}/80`;
+      }
+
+      moveCount = 0; // Reset move counter
+      renderPuzzle();
+      message.textContent = '';
+      enablePuzzle(); // Enable the puzzle after shuffling
+      hideShuffleAgainButton(); // Hide the "Shuffle Again" button
+      resetBoardColor(); // Reset board color to light gray
+    }
+
+    // Get possible moves (indices of tiles that can move into the empty space)
+    function getPossibleMoves() {
+      const moves = [];
+      const row = Math.floor(emptyIndex / 4);
+      const col = emptyIndex % 4;
+
+      // Check tile above
+      if (row > 0) moves.push(emptyIndex - 4);
+      // Check tile below
+      if (row < 3) moves.push(emptyIndex + 4);
+      // Check tile to the left
+      if (col > 0) moves.push(emptyIndex - 1);
+      // Check tile to the right
+      if (col < 3) moves.push(emptyIndex + 1);
+
+      return moves;
+    }
+
+    // Move a tile into the empty space (without updating the move counter)
+    function moveTile(index, updateCounter = true) {
       const row = Math.floor(index / 4);
       const col = index % 4;
       const emptyRow = Math.floor(emptyIndex / 4);
@@ -212,47 +329,23 @@
         // Swap the tile with the empty space
         [tiles[index], tiles[emptyIndex]] = [tiles[emptyIndex], tiles[index]];
         emptyIndex = index;
-        moveCount++; // Increment move counter
-        counter.textContent = `Moves: ${moveCount}/80`;
+
+        if (updateCounter) {
+          moveCount++; // Increment move counter
+          counter.textContent = `Moves: ${moveCount}/80`;
+        }
+
         renderPuzzle();
 
         // Check if the puzzle is solved
         if (isSolved()) {
           const score = calculateScore();
           message.textContent = `Congratulations! You solved the puzzle! Score: ${score}%`;
+          puzzleContainer.parentElement.classList.add('success'); // Turn board green
+          showShuffleAgainButton(); // Show the "Shuffle Again" button
           disablePuzzle(); // Disable the puzzle after solving
         }
       }
-    }
-
-    // Shuffle the tiles
-    function shuffleTiles() {
-      do {
-        tiles = tiles.sort(() => Math.random() - 0.5); // Randomly shuffle the tiles
-      } while (!isSolvable()); // Ensure the shuffled configuration is solvable
-      emptyIndex = tiles.indexOf(null); // Update the empty space index
-      moveCount = 0; // Reset move counter
-      counter.textContent = `Moves: ${moveCount}/80`;
-      renderPuzzle();
-      message.textContent = '';
-      enablePuzzle(); // Enable the puzzle after shuffling
-    }
-
-    // Check if the puzzle is solvable
-    function isSolvable() {
-      const tempTiles = tiles.filter(tile => tile !== null); // Ignore the empty space
-      let inversions = 0;
-
-      // Count the number of inversions
-      for (let i = 0; i < tempTiles.length - 1; i++) {
-        for (let j = i + 1; j < tempTiles.length; j++) {
-          if (tempTiles[i] > tempTiles[j]) inversions++;
-        }
-      }
-
-      // Check solvability based on the number of inversions and the empty space row
-      const emptyRow = Math.floor(emptyIndex / 4);
-      return (inversions % 2 === 0 && emptyRow % 2 === 1) || (inversions % 2 === 1 && emptyRow % 2 === 0);
     }
 
     // Check if the puzzle is solved
@@ -287,6 +380,27 @@
     function enablePuzzle() {
       puzzleContainer.classList.remove('disabled');
     }
+
+    // Show the "Shuffle Again" button
+    function showShuffleAgainButton() {
+      shuffleAgainButton.style.display = 'block';
+    }
+
+    // Hide the "Shuffle Again" button
+    function hideShuffleAgainButton() {
+      shuffleAgainButton.style.display = 'none';
+    }
+
+    // Reset board color to blue
+    function resetBoardColor() {
+      puzzleContainer.parentElement.classList.remove('success', 'unsolvable');
+    }
+
+    // Event listener for the "Shuffle Again" button
+    shuffleAgainButton.addEventListener('click', () => {
+      shuffleTiles();
+      hideShuffleAgainButton();
+    });
 
     // Start the game
     initializePuzzle();
