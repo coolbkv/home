@@ -1,0 +1,8 @@
+<h2>Welcome to My Blog</h2>
+<p>This is a simple blog post. You can add more content here.</p>
+<p>Here is a list of my favorite things:</p>
+<ul>
+    <li>Programming</li>
+    <li>Reading</li>
+    <li>Traveling</li>
+</ul>
