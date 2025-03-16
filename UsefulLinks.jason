@@ -1,0 +1,19 @@
+{
+  "websites": [
+    {
+      "name": "W3Schools",
+      "link": "https://www.w3schools.com",
+      "description": "A popular online platform offering free tutorials and references on web development languages, tools, and technologies."
+    },
+    {
+      "name": "TechOnTheNet",
+      "link": "https://www.techonthenet.com",
+      "description": "Offers concise and practical SQL tutorials, making it a valuable resource for learning and mastering database queries."
+    },
+    {
+      "name": "MathIsFun",
+      "link": "https://www.mathsisfun.com",
+      "description": "Learn Math, Physics and lots of puzzles to keep you engaged."
+    }
+  ]
+}
