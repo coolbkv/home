@@ -1,0 +1,5 @@
+name|link|description
+W3Schools|https://www.w3schools.com|A popular online platform offering free tutorials and references on web development languages, tools, and technologies.
+TechOnTheNet|https://www.techonthenet.com|Offers concise and practical SQL tutorials, making it a valuable resource for learning and mastering database queries.
+MathIsFun|https://www.mathsisfun.com|Learn Math, Physics and lots of puzzles to keep you engaged.
+AlternativeTo|https://alternativeto.net|A crowd-sourced and free site that helps you find better apps and services.

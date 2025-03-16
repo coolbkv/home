@@ -21,21 +21,36 @@
 </footer>
 
 <script>
-/* Get the current Year */
-document.getElementById("copyrightYear").innerHTML = new Date().getFullYear();
-
-/* Load links dynamically from the JSON file */
-fetch('UsefulLinks.json')
-  .then(response => response.json())
-  .then(data => {
-    const usefulLinks = document.getElementById('usefulLinks');
-    data.websites.forEach(website => {
-      const listItem = document.createElement('li');
-      listItem.innerHTML = `<a href="${website.link}" target="_blank">${website.name}</a> : ${website.description}`;
-      usefulLinks.appendChild(listItem);
-    });
-  })
-  .catch(error => console.error('Error loading links:', error));
-</script>
+    /* Get the current Year */
+    document.getElementById("copyrightYear").innerHTML = new Date().getFullYear();
+    
+    /* Function to convert text to JSON */
+    function csvToJson(csv) {
+      const rows = csv.split("\n");
+      const headers = rows[0].split("|");
+      const json = rows.slice(1).map(row => {
+        const values = row.split("|");
+        return headers.reduce((acc, header, index) => {
+          acc[header.trim()] = values[index]?.trim();
+          return acc;
+        }, {});
+      });
+      return json;
+    }
+    
+    /* Fetch and process the CSV file */
+    fetch('UsefulLinks.txt')
+      .then(response => response.text())
+      .then(csv => {
+        const websites = csvToJson(csv);
+        const usefulLinks = document.getElementById('usefulLinks');
+        websites.forEach(website => {
+          const listItem = document.createElement('li');
+          listItem.innerHTML = `<a href="${website.link}" target="_blank">${website.name}</a>: ${website.description}`;
+          usefulLinks.appendChild(listItem);
+        });
+      })
+      .catch(error => console.error('Error loading CSV:', error));
+    </script>
 </body>
 </html>
