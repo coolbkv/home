@@ -14,12 +14,7 @@
 </header>
 
 <h3 class="w3-margin">Useful Links</h3>
-
-<ul>
-    <li><a href="https://www.w3schools.com">W3Schools</a> :A popular online platform offering free tutorials and references on web development languages, tools, and technologies.</li>
-    <li><a href="https://www.techonthenet.com/">TechOnTheNet</a> :Offers concise and practical SQL tutorials, making it a valuable resource for learning and mastering database queries.</li>
-    <li><a href="https://www.mathsisfun.com/">MathIsFun</a> :Learn Math, Physics and lots of puzzels to keey you engagged.</li>
-</ul>
+<ul id="usefulLinks"></ul>
 
 <footer class="w3-container w3-teal w3-center w3-margin-top">
   &copy; <span id="copyrightYear"></span> Brajesh Kumar
@@ -30,7 +25,7 @@
 document.getElementById("copyrightYear").innerHTML = new Date().getFullYear();
 
 /* Load links dynamically from the JSON file */
-fetch('links.json')
+fetch('UsefulLinks.json')
   .then(response => response.json())
   .then(data => {
     const usefulLinks = document.getElementById('usefulLinks');

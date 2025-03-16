@@ -14,6 +14,16 @@
       "name": "MathIsFun",
       "link": "https://www.mathsisfun.com",
       "description": "Learn Math, Physics and lots of puzzles to keep you engaged."
+    },
+    {
+      "name": "MathIsFun",
+      "link": "https://www.mathsisfun.com",
+      "description": "Learn Math, Physics and lots of puzzles to keep you engaged."
+    },
+    {
+      "name": "AlternativeTo",
+      "link": "https://alternativeto.net/",
+      "description": "A crowd-sourced and free site that helps you find better apps and services."
     }
   ]
 }
