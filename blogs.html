@@ -4,33 +4,16 @@
     <title>Blogs</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+	<script src="commonScript.js"></script>
 </head>
-<body>
 
-<header class="w3-bar w3-black">
-	<a href="index.html" class="w3-bar-item w3-button">Home</a>
-	<a href="blogs.html" class="w3-bar-item w3-button">Blogs</a>
-	<a href="game.html" class="w3-bar-item w3-button">Game</a>
-</header>
+<body onload="loadHeaderFooter(); loadBlogContents();">
+<div id="header"></div>
     
     <div class="w3-container" id="blog-content">
         <!-- Content will be loaded here -->
     </div>
 
-<footer class="w3-container w3-teal w3-center w3-margin-top">
-  &copy; <span id="copyrightYear"></span><a href="https://www.linkedin.com/in/linkbrajesh/">Brajesh Kumar</a>
-</footer>
-
-<script>
-	// JavaScript to fetch and display the content of blog1.txt
-	fetch('blogList.html')
-		.then(response => response.text())
-		.then(data => {
-			document.getElementById('blog-content').innerHTML = data;
-		})
-		.catch(error => console.error('Error fetching the blog content:', error));
-			
-document.getElementById("copyrightYear").innerHTML = new Date().getFullYear();
-</script>
+<div id="footer"></div>
 </body>
 </html>
