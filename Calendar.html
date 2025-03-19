@@ -151,16 +151,19 @@
                 type: event.type
             }));
 
-            // Generate only the current month for mobile
+            // Determine if it's a mobile device
             const isMobile = window.innerWidth <= 768;
+
+            // Generate months: current month and next month for mobile, or 12 months for desktop
             const months = [];
             if (isMobile) {
-                months.push(new Date(currentYear, currentMonth, 1));
+                // For mobile, show current month and next month
+                months.push(new Date(currentYear, currentMonth, 1)); // Current month
+                months.push(new Date(currentYear, currentMonth + 1, 1)); // Next month
             } else {
-                // Generate 12 months: 2 previous, 1 current, and 9 upcoming
+                // For desktop, show 12 months: 2 previous, 1 current, and 9 upcoming
                 for (let i = -2; i <= 9; i++) {
-                    const month = new Date(currentYear, currentMonth + i, 1);
-                    months.push(month);
+                    months.push(new Date(currentYear, currentMonth + i, 1));
                 }
             }
 
