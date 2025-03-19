@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsive Calendar with Events</title>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <style>
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding: 20px;
+    }
+    .calendar-container {
+      flex: 1 1 calc(75% - 20px);
+      max-width: calc(75% - 20px);
+    }
+    .important-dates {
+      flex: 1 1 calc(25% - 20px);
+      max-width: calc(25% - 20px);
+      background-color: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .month-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .month {
+      flex: 1 1 calc(33.333% - 20px);
+      max-width: calc(33.333% - 20px);
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .month table {
+      width: 100%;
+      table-layout: fixed;
+    }
+    .month th, .month td {
+      text-align: center;
+      padding: 10px;
+      border: 1px solid #ddd;
+    }
+    .month th {
+      background-color: #f1f1f1;
+      font-weight: bold;
+    }
+    .month td {
+      height: 40px;
+      vertical-align: middle;
+    }
+    .month td.empty {
+      background-color: #f9f9f9;
+    }
+    .month td.today {
+      background-color: #4CAF50;
+      color: white;
+      font-weight: bold;
+    }
+    .month td.event {
+      font-weight: bold;
+    }
+    .month td.saturday,
+    .month td.sunday {
+      color: red; /* Red font for Saturday and Sunday */
+    }
+    .month td.uk-holiday,
+    .month td.india-holiday {
+      background-color: orange; /* Orange background for UK and INDIA holidays */
+    }
+    .month td.nse-holiday {
+      background-color: gray; /* Gray background for NSE holidays */
+    }
+    .month td.separator {
+      border-bottom: 2px solid black; /* Line for separator */
+    }
+    .current-month {
+      border: 2px solid green; /* Green border for current month */
+    }
+    @media (max-width: 768px) {
+      .month {
+        flex: 1 1 calc(50% - 20px);
+        max-width: calc(50% - 20px);
+      }
+    }
+    @media (max-width: 480px) {
+      .month {
+        flex: 1 1 100%;
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body class="w3-container">
+  <h1 class="w3-center">Responsive Calendar</h1>
+  <div class="container">
+    <div class="calendar-container">
+      <!-- Calendar will be dynamically generated here -->
+    </div>
+    <div class="important-dates">
+      <h3>Upcoming Events</h3>
+      <ul id="important-dates-list">
+        <!-- Events will be dynamically added here -->
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // Function to fetch events from a file
+    async function fetchEvents() {
+      try {
+        const response = await fetch('events.txt'); // Path to your events file
+        const data = await response.text();
+        const events = data
+          .split('\n')
+          .filter(line => line.trim() || line.trim() === '') // Include blank lines
+          .map(line => {
+            if (line.trim() === '') {
+              return { type: 'separator' }; // Mark blank lines as separators
+            } else {
+              const [date, event] = line.split('|');
+              const [category, eventName] = event.split(':').map(item => item.trim());
+              return { date: date.trim(), category: category, event: eventName, type: 'event' };
+            }
+          });
+        return events;
+      } catch (error) {
+        console.error('Error fetching events:', error);
+        return [];
+      }
+    }
+
+    // Function to generate the calendar
+    async function generateCalendar() {
+      const calendarContainer = document.querySelector('.calendar-container');
+      const today = new Date();
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+
+      // Fetch events
+      const events = await fetchEvents();
+      const eventDates = events.map(event => ({
+        date: event.date,
+        category: event.category,
+        event: event.event,
+        type: event.type
+      }));
+
+      // Generate 12 months: 2 previous, 1 current, and 9 upcoming
+      const months = [];
+      for (let i = -2; i <= 9; i++) {
+        const month = new Date(currentYear, currentMonth + i, 1);
+        months.push(month);
+      }
+
+      // Organize months into rows of 3
+      for (let i = 0; i < months.length; i += 3) {
+        const monthRow = document.createElement('div');
+        monthRow.className = 'month-row';
+
+        for (let j = 0; j < 3; j++) {
+          if (i + j >= months.length) break;
+
+          const month = months[i + j];
+          const monthName = month.toLocaleString('default', { month: 'long' });
+          const year = month.getFullYear();
+          const daysInMonth = new Date(year, month.getMonth() + 1, 0).getDate();
+          const firstDayOfWeek = (new Date(year, month.getMonth(), 1).getDay() + 6) % 7; // Adjust for Monday as first day
+
+          // Create month container
+          const monthDiv = document.createElement('div');
+          monthDiv.className = 'month w3-card-4';
+
+          // Add green border for current month
+          if (i + j === 2) {
+            monthDiv.classList.add('current-month');
+          }
+
+          // Add month and year as header
+          const header = document.createElement('h3');
+          header.className = 'w3-center w3-padding';
+          header.textContent = `${monthName} ${year}`;
+          monthDiv.appendChild(header);
+
+          // Create table for calendar
+          const table = document.createElement('table');
+          table.className = 'w3-table w3-bordered';
+
+          // Add weekdays header (starting with Monday)
+          const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+          const headerRow = document.createElement('tr');
+          weekdays.forEach(day => {
+            const th = document.createElement('th');
+            th.textContent = day;
+            headerRow.appendChild(th);
+          });
+          table.appendChild(headerRow);
+
+          // Add days to the table
+          let day = 1;
+          for (let row = 0; row < 6; row++) {
+            const tr = document.createElement('tr');
+            for (let col = 0; col < 7; col++) {
+              const td = document.createElement('td');
+              if (row === 0 && col < firstDayOfWeek) {
+                td.className = 'empty';
+              } else if (day > daysInMonth) {
+                td.className = 'empty';
+              } else {
+                td.textContent = day;
+                const dateStr = `${String(day).padStart(2, '0')}-${monthName.slice(0, 3).toUpperCase()}-${year}`;
+
+                // Check if the date has an event
+                const event = eventDates.find(event => event.date === dateStr);
+                if (event) {
+                  if (event.type === 'separator') {
+                    td.classList.add('separator'); // Add separator line
+                  } else {
+                    td.classList.add('event');
+                    if (event.category === 'UK' || event.category === 'INDIA') {
+                      td.classList.add(`${event.category.toLowerCase()}-holiday`);
+                    } else if (event.category === 'NSE') {
+                      td.classList.add('nse-holiday');
+                    }
+                  }
+                }
+
+                // Highlight current day
+                if (i + j === 2 && day === today.getDate()) {
+                  td.className = 'today';
+                }
+
+                // Add red font for Saturday and Sunday
+                if (col === 5) {
+                  td.classList.add('saturday'); // Saturday
+                } else if (col === 6) {
+                  td.classList.add('sunday'); // Sunday
+                }
+
+                day++;
+              }
+              tr.appendChild(td);
+            }
+            table.appendChild(tr);
+            if (day > daysInMonth) break;
+          }
+
+          monthDiv.appendChild(table);
+          monthRow.appendChild(monthDiv);
+        }
+
+        calendarContainer.appendChild(monthRow);
+      }
+
+      // Add events to the sidebar (only upcoming events)
+      const importantDatesList = document.getElementById('important-dates-list');
+      const todayStr = `${String(today.getDate()).padStart(2, '0')}-${today.toLocaleString('default', { month: 'short' }).toUpperCase()}-${today.getFullYear()}`;
+
+      events.forEach(event => {
+        if (event.type === 'separator') {
+          // Add a horizontal line for separators
+          const hr = document.createElement('hr');
+          importantDatesList.appendChild(hr);
+        } else {
+          const eventDateStr = event.date;
+          const eventDate = new Date(eventDateStr.split('-').reverse().join('-'));
+          if (eventDate >= today) { // Only display future or today's events
+            const li = document.createElement('li');
+            li.textContent = `${event.date}: ${event.category}: ${event.event}`;
+            importantDatesList.appendChild(li);
+          }
+        }
+      });
+    }
+
+    // Generate the calendar on page load
+    window.onload = generateCalendar;
+  </script>
+</body>
+</html>

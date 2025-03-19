@@ -1,0 +1,29 @@
+31-MAR-2025|NSE:Eid-Ul-Fitr (Ramzan Eid)
+10-APR-2025|NSE:Mahavir Jayanti
+14-APR-2025|NSE:Dr. Baba Saheb Ambedkar Jayanti
+18-APR-2025|NSE:Good Friday
+21-APR-2025|UK:Easter Monday
+01-MAY-2025|NSE:Maharashtra Day
+05-MAY-2025|UK:Early May Bank Holiday
+26-MAY-2025|UK:Spring Bank Holiday
+15-AUG-2025|NSE:Independence Day
+25-AUG-2025|UK:Summer Bank Holiday
+27-AUG-2025|NSE:Ganesh Chaturthi
+02-OCT-2025|NSE:Mahatma Gandhi Jayanti
+21-OCT-2025|NSE:Diwali-Laxmi Pujan (Muhurat trading session)
+22-OCT-2025|NSE:Diwali-Balipratipada
+05-NOV-2025|NSE:Gurunanak Jayanti
+25-DEC-2025|UK:Christmas Day
+26-DEC-2025|UK:Boxing Day
+
+01-JAN-2026|NSE:New Year's Day
+26-JAN-2026|NSE:Republic Day
+06-MAR-2026|NSE:Holi
+27-MAR-2026|NSE:Good Friday
+03-APR-2026|UK:Good Friday
+06-APR-2026|UK:Easter Monday
+04-MAY-2026|UK:Early May Bank Holiday
+25-MAY-2026|UK:Spring Bank Holiday
+31-AUG-2026|UK:Summer Bank Holiday
+25-DEC-2026|UK:Christmas Day
+28-DEC-2026|UK:Boxing Day (substitute day)
