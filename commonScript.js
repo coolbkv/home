@@ -542,6 +542,9 @@ function load15PuzzleGame(){
       hideShuffleAgainButton();
     });
 
+    // Expose the inner function to the global scope
+    window.changeLevel=changeLevel;
+
     // Start the game
     initializePuzzle();
 }
