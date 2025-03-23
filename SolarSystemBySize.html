@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solar System Planets Scaled to Selected Body</title>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <script src="commonScript.js"></script>
+  <style>
+    .circle-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 20px;
+    }
+    .circle-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .circle {
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px black;
+      position: relative;
+    }
+    .circle-name {
+      writing-mode: vertical-lr; /* Vertical text */
+      transform: rotate(180deg); /* Rotate to make it readable from bottom to top */
+      font-weight: bold;
+      color: black;
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    th, td {
+      padding: 10px;
+      text-align: center;
+      border: 1px solid #ddd;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .dropdown-container {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .selected-row {
+      font-weight: bold;
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body class="w3-container" onload="loadHeaderFooter();>
+<div id="header"></div>
+
+  <h1 class="w3-padding-16">Solar System Planets Scaled to Selected Body</h1>
+
+  <!-- Dropdowns for Selection -->
+  <div class="dropdown-container">
+    <label for="celestialBody">Select Celestial Body:</label>
+    <select id="celestialBody">
+      <option value="Sun">Sun</option>
+      <option value="Jupiter">Jupiter</option>
+      <option value="Saturn">Saturn</option>
+      <option value="Uranus">Uranus</option>
+      <option value="Neptune">Neptune</option>
+      <option value="Earth">Earth</option>
+      <option value="Venus">Venus</option>
+      <option value="Mars">Mars</option>
+      <option value="Mercury">Mercury</option>
+    </select>
+
+    <label for="scale">Select Scale (cm):</label>
+    <select id="scale">
+      <option value="1">1 cm</option>
+      <option value="2">2 cm</option>
+      <option value="3">3 cm</option>
+      <option value="4">4 cm</option>
+      <option value="5">5 cm</option>
+      <option value="6">6 cm</option>
+      <option value="7">7 cm</option>
+      <option value="8">8 cm</option>
+      <option value="9">9 cm</option>
+      <option value="10">10 cm</option>
+    </select>
+  </div>
+
+  <!-- Table with Data -->
+  <table id="dataTable">
+    <thead>
+      <tr>
+        <th>Celestial Body</th>
+        <th>Average Radius (km)</th>
+        <th>Scaled Radius (cm)</th>
+        <th>How Many Fit in Selected Body</th>
+        <th>% Smaller Than Selected Body</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Data will be dynamically populated here -->
+    </tbody>
+  </table>
+
+  <!-- Circles for Sun and Planets (Sorted from Smallest to Largest) -->
+  <div class="circle-container" id="circleContainer">
+    <!-- Circles will be dynamically generated here -->
+  </div>
+
+  <p class="w3-padding-16">Select a celestial body and a scale to see the proportional sizes and data.</p>
+
+  <script>
+    // Data for celestial bodies
+    const celestialData = [
+      { name: "Sun", radius: 696340 },
+      { name: "Jupiter", radius: 69911 },
+      { name: "Saturn", radius: 58232 },
+      { name: "Uranus", radius: 25362 },
+      { name: "Neptune", radius: 24622 },
+      { name: "Earth", radius: 6371 },
+      { name: "Venus", radius: 6052 },
+      { name: "Mars", radius: 3390 },
+      { name: "Mercury", radius: 2440 },
+    ];
+
+    // Function to update the visualization and table
+    function updateVisualization() {
+      const selectedBody = document.getElementById("celestialBody").value;
+      const selectedScale = parseFloat(document.getElementById("scale").value);
+
+      // Find the selected body's data
+      const selectedBodyData = celestialData.find(body => body.name === selectedBody);
+      const selectedBodyRadius = selectedBodyData.radius;
+
+      // Clear existing circles
+      const circleContainer = document.getElementById("circleContainer");
+      circleContainer.innerHTML = "";
+
+      // Clear existing table data
+      const tableBody = document.querySelector("#dataTable tbody");
+      tableBody.innerHTML = "";
+
+      // Generate table rows and collect circle data
+      const circleData = [];
+      celestialData.forEach(body => {
+        const scaledRadius = (body.radius / selectedBodyRadius) * selectedScale;
+        const howManyFit = Math.pow(selectedBodyRadius / body.radius, 3).toLocaleString();
+        const percentSmaller = (body.radius < selectedBodyRadius)
+          ? (100 * (1 - body.radius / selectedBodyRadius)).toFixed(1) + "%"
+          : "NA";
+
+        // Add table row
+        const row = document.createElement("tr");
+        if (body.name === selectedBody) {
+          row.classList.add("selected-row"); // Highlight selected row
+        }
+        row.innerHTML = `
+          <td>${body.name}</td>
+          <td>${body.radius.toLocaleString()}</td>
+          <td>${scaledRadius.toFixed(2)}</td>
+          <td>${howManyFit}</td>
+          <td>${percentSmaller}</td>
+        `;
+        tableBody.appendChild(row);
+
+        // Collect circle data for sorting
+        circleData.push({ name: body.name, scaledRadius: scaledRadius });
+      });
+
+      // Sort circles from smallest to largest
+      circleData.sort((a, b) => a.scaledRadius - b.scaledRadius);
+
+      // Generate circles in sorted order
+      circleData.forEach(data => {
+        const circleItem = document.createElement("div");
+        circleItem.className = "circle-item";
+
+        // Add name (vertical text)
+        const circleName = document.createElement("div");
+        circleName.className = "circle-name";
+        circleName.textContent = data.name;
+        circleItem.appendChild(circleName);
+
+        // Add circle
+        const circle = document.createElement("div");
+        circle.className = `circle`;
+        circle.style.width = `${data.scaledRadius * 20}px`;
+        circle.style.height = `${data.scaledRadius * 20}px`;
+        circle.style.backgroundColor = getActualColor(data.name); // Use actual colors
+        circle.textContent = ""; // Remove text from circle
+        circleItem.appendChild(circle);
+
+        circleContainer.appendChild(circleItem);
+      });
+    }
+
+    // Function to get actual color based on celestial body
+    function getActualColor(name) {
+      switch (name) {
+        case "Sun": return "#FFD700"; // Gold
+        case "Jupiter": return "#B07F35"; // Brownish
+        case "Saturn": return "#F4C430"; // Sandy Yellow
+        case "Uranus": return "#AFEEEE"; // Pale Blue
+        case "Neptune": return "#4169E1"; // Royal Blue
+        case "Earth": return "#1E90FF"; // Dodger Blue
+        case "Venus": return "#E6B447"; // Golden Brown
+        case "Mars": return "#FF4500"; // Red-Orange
+        case "Mercury": return "#A9A9A9"; // Dark Gray
+        default: return "black";
+      }
+    }
+
+    // Add event listeners to dropdowns
+    document.getElementById("celestialBody").addEventListener("change", updateVisualization);
+    document.getElementById("scale").addEventListener("change", updateVisualization);
+
+    // Initialize with default values
+    updateVisualization();
+  </script>
+<div id="footer"></div>
+</body>
+</html>
