@@ -295,6 +295,7 @@ function loadTicTacToe(){
     }
 
     // Initialize the game
+    window.resetGame=resetGame;
     resetGame();
 }
 
