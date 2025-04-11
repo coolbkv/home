@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar System Explorer</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Space+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --space-blue: #0b3d91;
+            --star-yellow: #f5d76e;
+            --planet-gray: #b0b0b0;
+        }
+        
+        body {
+            font-family: 'Space Mono', monospace;
+            background-color: #000;
+            color: white;
+            background-image: 
+                radial-gradient(white 1px, transparent 1px),
+                radial-gradient(white 1px, transparent 1px);
+            background-size: 50px 50px;
+            background-position: 0 0, 25px 25px;
+        }
+        
+        h1, h2, h3 {
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .header {
+            background: linear-gradient(90deg, #000428, #004e92);
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            text-shadow: 0 0 10px var(--star-yellow);
+            animation: glow 2s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 5px var(--star-yellow); }
+            to { text-shadow: 0 0 20px var(--star-yellow), 0 0 10px #fff; }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        .input-section {
+            background: rgba(11, 61, 145, 0.7);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 20px rgba(0, 78, 146, 0.5);
+        }
+        
+        .w3-input {
+            background-color: rgba(255, 255, 255, 0.9) !important;
+            border-radius: 5px !important;
+        }
+        
+        .w3-input:invalid {
+            border: 2px solid #ff4444 !important;
+            animation: shake 0.5s;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .w3-button {
+            transition: all 0.3s !important;
+        }
+        
+        .w3-button:hover {
+            transform: scale(1.05) !important;
+            box-shadow: 0 0 15px var(--star-yellow) !important;
+        }
+        
+        .planet-card {
+            margin: 1rem 0;
+            padding: 1.5rem;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .planet-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .planet-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            transform: rotate(30deg);
+        }
+        
+        .mercury { background-color: #b0b0b0; }
+        .venus { background-color: #d4af37; }
+        .earth { background-color: #2e8b57; }
+        .mars { background-color: #b22222; }
+        .jupiter { background-color: #d2b48c; }
+        .saturn { background-color: #f4a460; }
+        .uranus { background-color: #afeeee; }
+        .neptune { background-color: #4682b4; }
+        
+        .moon-card {
+            background-color: rgba(255, 255, 255, 0.1);
+            margin: 0.5rem 0 0.5rem 1rem;
+            padding: 1rem;
+            border-radius: 10px;
+            border-left: 4px solid white;
+        }
+        
+        .fun-fact {
+            background-color: rgba(245, 215, 110, 0.2);
+            padding: 0.8rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+            border-left: 4px solid var(--star-yellow);
+            font-style: italic;
+        }
+        
+        .dot {
+            width: 15px;
+            height: 15px;
+            background-color: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            box-shadow: 0 0 10px white;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .planet-card {
+                padding: 1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .input-section {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>🌌 Solar System Explorer 🚀</h1>
+</div>
+
+<div class="container">
+    <div class="input-section w3-card">
+        <label for="earthAge">Enter your age on Earth:</label>
+        <input type="number" id="earthAge" class="w3-input w3-border" placeholder="Example: 10" required>
+        <label for="earthWeight">Enter your weight on Earth (kg):</label>
+        <input type="number" id="earthWeight" class="w3-input w3-border" placeholder="Example: 30" required>
+        <button onclick="calculateAgeAndWeight()" class="w3-button w3-teal w3-margin-top">Blast Off! Calculate</button>
+    </div>
+
+    <div id="planetList" class="w3-container">
+        <!-- Planet information will be inserted here -->
+    </div>
+</div>
+
+<script>
+    const vSpeed = 5;
+    const planets = [
+        { 
+            name: "Mercury", 
+            dayLength: "58.6 Earth days", 
+            orbitYears: 0.24, 
+            className: "mercury", 
+            speed: 1/0.24 * vSpeed, 
+            moons: 0, 
+            gravity: 3.7,
+            funFact: "A year on Mercury is shorter than its day! It zooms around the Sun in 88 days but spins so slowly that one day lasts 176 Earth days!"
+        },
+        { 
+            name: "Venus", 
+            dayLength: "243 Earth days", 
+            orbitYears: 0.62, 
+            className: "venus", 
+            speed: 1/0.62 * vSpeed, 
+            moons: 0, 
+            gravity: 8.87,
+            funFact: "The brightest 'star' in the night sky! (It's not a star—it's a planet reflecting sunlight!)"
+        },
+        { 
+            name: "Earth", 
+            dayLength: "24 hours", 
+            orbitYears: 1, 
+            className: "earth", 
+            speed: 1 * vSpeed, 
+            moons: 1, 
+            gravity: 9.81,
+            funFact: "70% of our planet is water, but only 1% is drinkable—so we must protect it!"
+        },
+        { 
+            name: "Mars", 
+            dayLength: "24.6 hours", 
+            orbitYears: 1.88, 
+            className: "mars", 
+            speed: 1/1.88 * vSpeed, 
+            moons: 2, 
+            gravity: 3.71,
+            funFact: "Known as the 'Red Planet' because it's covered in rusty iron dust—like a giant desert with red sand!"
+        },
+        { 
+            name: "Jupiter", 
+            dayLength: "9.9 hours", 
+            orbitYears: 11.86, 
+            className: "jupiter", 
+            speed: 1/11.86 * vSpeed, 
+            moons: 79, 
+            gravity: 24.79,
+            funFact: "So big that all other planets could fit inside it! And its Great Red Spot is a storm bigger than Earth!"
+        },
+        { 
+            name: "Saturn", 
+            dayLength: "10.7 hours", 
+            orbitYears: 29.46, 
+            className: "saturn", 
+            speed: 1/29.46 * vSpeed, 
+            moons: 83, 
+            gravity: 10.44,
+            funFact: "If you had a bathtub big enough, Saturn would float (it's less dense than water!)"
+        },
+        { 
+            name: "Uranus", 
+            dayLength: "17.2 hours", 
+            orbitYears: 84, 
+            className: "uranus", 
+            speed: 1/84 * vSpeed, 
+            moons: 27, 
+            gravity: 8.69,
+            funFact: "Rolls around the Sun like a bowling ball—it's tilted sideways!"
+        },
+        { 
+            name: "Neptune", 
+            dayLength: "16.1 hours", 
+            orbitYears: 164.8, 
+            className: "neptune", 
+            speed: 1/164.8 * vSpeed, 
+            moons: 14, 
+            gravity: 11.15,
+            funFact: "The windiest planet—storms here could blow a football stadium away!"
+        }
+    ];
+
+    const moons = [
+        { name: "Moon", planet: "Earth", orbitDays: "27.3", gravity: 1.62, funFact: "It's slowly drifting away (about 4 cm per year—like growing a fingernail!)" },
+        { name: "Phobos", planet: "Mars", orbitDays: "0.3", gravity: 0.0057, funFact: "A moon that's falling apart! It's getting closer to Mars and might crash in 50 million years!" },
+        { name: "Deimos", planet: "Mars", orbitDays: "1.3", gravity: 0.003, funFact: "Looks like a lumpy potato in space!" },
+        { name: "Io", planet: "Jupiter", orbitDays: "1.8", gravity: 1.796, funFact: "Covered in volcanoes that shoot lava into space—like a cosmic fireworks show!" },
+        { name: "Europa", planet: "Jupiter", orbitDays: "3.5", gravity: 1.314, funFact: "Has a hidden ocean under its ice—scientists think alien fish might live there!" },
+        { name: "Ganymede", planet: "Jupiter", orbitDays: "7.2", gravity: 1.428, funFact: "The biggest moon in the solar system (even larger than Mercury!)" },
+        { name: "Callisto", planet: "Jupiter", orbitDays: "16.7", gravity: 1.235, funFact: "One of the most heavily cratered places in the solar system!" },
+        { name: "Titan", planet: "Saturn", orbitDays: "15.9", gravity: 1.352, funFact: "The only moon with rain, rivers and lakes (but they're made of gasoline-like liquid, not water!)" },
+        { name: "Enceladus", planet: "Saturn", orbitDays: "1.4", gravity: 0.113, funFact: "Shoots giant water geysers into space—like a cosmic snow machine!" },
+        { name: "Miranda", planet: "Uranus", orbitDays: "1.4", gravity: 0.079, funFact: "Looks like it was smashed and glued back together!" },
+        { name: "Triton", planet: "Neptune", orbitDays: "5.9", gravity: 0.779, funFact: "Orbits backwards and has ice volcanoes that spew frozen nitrogen!" }
+    ];
+
+    const planetList = document.getElementById('planetList');
+
+    function formatTimePeriod(days) {
+        const daysNum = parseFloat(days);
+        const years = Math.floor(daysNum / 365);
+        const remainingDaysAfterYears = daysNum % 365;
+        const months = Math.floor(remainingDaysAfterYears / 30);
+        const daysRemaining = Math.round(remainingDaysAfterYears % 30);
+        
+        let result = '';
+        if (years > 0) result += `${years} years`;
+        if (months > 0) result += `${result ? ', ' : ''}${months} months`;
+        if (daysRemaining > 0) result += `${result ? ', and ' : ''}${daysRemaining} days`;
+        
+        return result || 'less than a day';
+    }
+
+    function calculateAgeAndWeight() {
+        const earthAgeInput = document.getElementById('earthAge').value;
+        const earthWeightInput = document.getElementById('earthWeight').value;
+        
+        // Check if inputs are valid numbers
+        if (!earthAgeInput || isNaN(earthAgeInput)) {
+            alert("🚀 Whoops! Please enter your real age (like 8 or 10)");
+            return;
+        }
+        
+        if (!earthWeightInput || isNaN(earthWeightInput)) {
+            alert("⚖️ Hold on! Please enter your weight as a number (like 30 or 45)");
+            return;
+        }
+        
+        const earthAge = parseFloat(earthAgeInput);
+        const earthWeight = parseFloat(earthWeightInput);
+        
+        planetList.innerHTML = ''; // Clear previous results
+        
+        planets.forEach(planet => {
+            const planetAgeInYears = earthAge / planet.orbitYears;
+            const years = Math.floor(planetAgeInYears);
+            const monthsDecimal = (planetAgeInYears - years) * 12;
+            const months = Math.floor(monthsDecimal);
+            const days = Math.round((monthsDecimal - months) * 30);
+
+            let ageString = '';
+            if (years > 0) ageString += `${years} years`;
+            if (months > 0) ageString += `${ageString ? ', ' : ''}${months} months`;
+            if (days > 0) ageString += `${ageString ? ', and ' : ''}${days} days`;
+
+            const planetWeight = (earthWeight * planet.gravity / 9.81).toFixed(2);
+
+            // Calculate orbit period breakdown
+            const orbitYears = planet.orbitYears;
+            const orbitYearsInt = Math.floor(orbitYears);
+            const orbitMonthsDecimal = (orbitYears - orbitYearsInt) * 12;
+            const orbitMonths = Math.floor(orbitMonthsDecimal);
+            const orbitDays = Math.round((orbitMonthsDecimal - orbitMonths) * 30);
+            
+            let orbitString = '';
+            if (orbitYearsInt > 0) orbitString += `${orbitYearsInt} years`;
+            if (orbitMonths > 0) orbitString += `${orbitString ? ', ' : ''}${orbitMonths} months`;
+            if (orbitDays > 0) orbitString += `${orbitString ? ', and ' : ''}${orbitDays} days`;
+
+            const planetDiv = document.createElement('div');
+            planetDiv.className = `planet-card w3-card-4 w3-padding ${planet.className}`;
+            planetDiv.innerHTML = `
+                <h3>${planet.name}</h3>
+                <div class="dot" id="${planet.name.toLowerCase()}Dot"></div>
+                <p><strong>🕒 Length of Day:</strong> ${planet.dayLength}</p>
+                <p><strong>🔄 Orbit Period:</strong> ${orbitString}</p>
+                <p><strong>🌙 Number of Moons:</strong> ${planet.moons}</p>
+                <p><strong>⚖️ Gravity:</strong> ${planet.gravity} m/s²</p>
+                <p><strong>👶 Your Age on ${planet.name}:</strong> ${ageString}</p>
+                <p><strong>🏋️ Your Weight on ${planet.name}:</strong> ${planetWeight} kg</p>
+                <div class="fun-fact">✨ <strong>Fun Fact:</strong> ${planet.funFact}</div>
+            `;
+            planetList.appendChild(planetDiv);
+
+            // Add moons for this planet
+            moons.filter(moon => moon.planet === planet.name).forEach(moon => {
+                const moonWeight = (earthWeight * moon.gravity / 9.81).toFixed(2);
+                const moonOrbitString = formatTimePeriod(moon.orbitDays);
+                
+                const moonDiv = document.createElement('div');
+                moonDiv.className = `moon-card w3-card-4 w3-padding`;
+                moonDiv.innerHTML = `
+                    <h4>🌕 ${moon.name}</h4>
+                    <p><strong>🔄 Orbit Period:</strong> ${moonOrbitString}</p>
+                    <p><strong>⚖️ Gravity:</strong> ${moon.gravity} m/s²</p>
+                    <p><strong>🏋️ Your Weight on ${moon.name}:</strong> ${moonWeight} kg</p>
+                    <div class="fun-fact">✨ <strong>Fun Fact:</strong> ${moon.funFact}</div>
+                `;
+                planetDiv.appendChild(moonDiv);
+            });
+
+            animateDot(planet.name.toLowerCase(), planet.speed);
+        });
+    }
+
+    function animateDot(planetName, speed) {
+        const dot = document.getElementById(`${planetName}Dot`);
+        let position = 0;
+        setInterval(() => {
+            position = (position + 1) % window.innerWidth;
+            dot.style.left = `${position}px`;
+        }, 1000 / speed);
+    }
+</script>
+
+</body>
+</html>
