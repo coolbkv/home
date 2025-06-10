@@ -2,51 +2,14 @@
 <html>
 <head>
     <title>Polygon Pi with Calculation Explanation</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            text-align: center;
-        }
-        .controls {
-            margin: 20px 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-        }
-        button {
-            width: 40px;
-            height: 40px;
-            font-size: 20px;
-            cursor: pointer;
-            background: #4285f4;
-            color: white;
-            border: none;
-            border-radius: 5px;
-        }
-        input {
-            width: 60px;
-            text-align: center;
-            font-size: 18px;
-            padding: 5px;
-        }
-        canvas {
-            border: 1px solid #ddd;
-            margin: 20px 0;
-            background: #f9f9f9;
-        }
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <script src="commonScript.js"></script>
+	<style>
         .pi-display {
             font-size: 22px;
             margin: 15px 0;
             font-family: monospace;
-        }
-        .precision-info {
-            color: #666;
-            font-style: italic;
-            margin-top: 5px;
         }
         .actual-pi {
             color: #2e7d32;
@@ -61,62 +24,52 @@
             font-weight: bold;
         }
         .learn-link {
-            color: #4285f4;
             cursor: pointer;
-            text-decoration: underline;
             margin-top: 20px;
             display: inline-block;
         }
-        .calculation-explanation {
-            background: #f5f5f5;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 15px;
-            text-align: left;
-            display: none;
-        }
-        .calculation-explanation h3 {
-            margin-top: 0;
-            color: #4285f4;
-        }
-        .angle-display {
-            margin: 10px 0;
-            font-size: 18px;
+        canvas {
+            border: 1px solid #ddd;
+            margin: 20px 0;
+            background: #f9f9f9;
         }
     </style>
 </head>
-<body>
-    <h1>Polygon Pi with Calculation Explanation</h1>
+<body class="w3-container" onload="loadHeaderFooter();">
+<div id="header"></div>
+    <h1 class="w3-center">Polygon Pi with Calculation Explanation</h1>
     
-    <div class="controls">
-        <button onclick="updateSides(-1)">−</button>
-        <input type="number" id="sideCount" min="3" max="1000" value="3">
-        <button onclick="updateSides(1)">+</button>
+    <div class="w3-center w3-margin-bottom">
+        <button class="w3-button w3-blue w3-circle" onclick="updateSides(-1)">−</button>
+        <input class="w3-input w3-border w3-center" style="width:80px;display:inline-block" type="number" id="sideCount" min="3" max="1000" value="3">
+        <button class="w3-button w3-blue w3-circle" onclick="updateSides(1)">+</button>
     </div>
     
-    <canvas id="polygonCanvas" width="600" height="400"></canvas>
+    <div class="w3-center">
+        <canvas id="polygonCanvas" width="600" height="400"></canvas>
+    </div>
     
-    <div class="pi-display">
+    <div class="pi-display w3-center">
         Sides: <span id="sidesDisplay">3</span> | 
         Approximation: <span id="piApproximation">2.598076</span>
     </div>
     
-    <div class="angle-display">
+    <div class="w3-center w3-large">
         Internal angle: <span id="internalAngle">60.00°</span>
     </div>
     
-    <div>
+    <div class="w3-center">
         Actual π: <span class="actual-pi">3.141592653589793</span>
     </div>
     
-    <div id="precisionInfo" class="precision-info">
+    <div id="precisionInfo" class="w3-center w3-text-grey w3-italic">
         Not correct to any decimal places
     </div>
 
-    <div class="learn-link" onclick="toggleExplanation()">Learn this calculation ▼</div>
+    <div class="learn-link w3-center w3-text-blue" onclick="toggleExplanation()">Learn this calculation ▼</div>
     
-    <div id="calculationExplanation" class="calculation-explanation">
-        <h3>How we calculate π using polygons:</h3>
+    <div id="calculationExplanation" class="w3-panel w3-light-grey w3-leftbar w3-border-grey" style="display:none">
+        <h3 class="w3-text-blue">How we calculate π using polygons:</h3>
         <ol>
             <li><strong>Regular Polygon:</strong> All sides and angles are equal</li>
             <li><strong>Circumscribed Circle:</strong> A circle that passes through all vertices (corners) of the polygon</li>
@@ -294,5 +247,6 @@
         // Initial draw
         drawPolygon();
     </script>
+<div id="footer"></div>
 </body>
 </html>
