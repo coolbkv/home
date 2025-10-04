@@ -3,4 +3,4 @@ W3Schools|https://www.w3schools.com|A popular online platform offering free tuto
 TechOnTheNet|https://www.techonthenet.com|Offers concise and practical SQL tutorials, making it a valuable resource for learning and mastering database queries.
 MathIsFun|https://www.mathsisfun.com|Learn Math, Physics and lots of puzzles to keep you engaged.
 AlternativeTo|https://alternativeto.net|A crowd-sourced and free site that helps you find better apps and services.
-GitHub|https://github.com/|GitHub is test a comprehensive platform for version control and collaboration, offering features like GitHub Actions for continuous integration and continuous deployment (CI/CD), GitHub Copilot for AI-assisted coding, and GitHub Pages for hosting websites.
+GitHub|https://github.com/|GitHub is a comprehensive platform for version control and collaboration, offering features like GitHub Actions for continuous integration and continuous deployment (CI/CD), GitHub Copilot for AI-assisted coding, and GitHub Pages for hosting websites.
